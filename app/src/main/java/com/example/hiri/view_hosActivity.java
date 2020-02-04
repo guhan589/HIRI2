@@ -27,9 +27,9 @@ public class view_hosActivity extends AppCompatActivity {
     ArrayList<String> list;
     Button CallButton, ReCallButton;
     private Vibrator vibrator;
-    TextToSpeech tts;
+    TextToSpeech ttsClient;
     int count1 = 0,count2 = 0,num=0;
-    String teststring = "",str="",yadmNm;
+    String teststring = "",str="",yadmNm="";
     HashMap<String,String> code;
     Intent call = null;
     @Override
@@ -37,7 +37,7 @@ public class view_hosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_hos);
 
-        String yadmNm = getIntent().getStringExtra("yadmNm");
+        yadmNm = getIntent().getStringExtra("yadmNm");
         String totalinformation  = getIntent().getStringExtra("information");
 
 
@@ -80,7 +80,7 @@ public class view_hosActivity extends AppCompatActivity {
             String key1 = it.next();
             String key2 = code.get(key1);
         }
-        ttsC = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        ttsClient = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
 
@@ -93,8 +93,8 @@ public class view_hosActivity extends AppCompatActivity {
                     str = " 말씀하신 진료과목  "+yadmNm+" 를 진료하는 병원 총" + count1 + "건을 검색하였습니다. 병원목록을 불러드리겠습니다.  " + teststring + "  이상입니다. 다시 들으시려면 핸드폰 화면 세로중앙을 기준으로 하단 버튼을 누르시거나  "+
                             "  검색하고자 하는 병원이 있으면 상단 버튼을 눌러 병원의 번호를 말하십시오.";
                 }
-                tts.setPitch(0.8f);
-                tts.speak(str,TextToSpeech.QUEUE_FLUSH,null);
+                ttsClient.setPitch(0.8f);
+                ttsClient.speak(str,TextToSpeech.QUEUE_FLUSH,null);
             }
 
         });
@@ -106,7 +106,7 @@ public class view_hosActivity extends AppCompatActivity {
             @Override
             public void onClick(View V) {
                 String str1;
-                vibrator.vibrate(250);
+
                 str1 = "찾고자 하는 병원 번호를 말하십시오. 예를 들어 1번";
                 tts.speak(str1, TextToSpeech.QUEUE_FLUSH, null);
                 new Handler().postDelayed(new Runnable() {
@@ -123,7 +123,7 @@ public class view_hosActivity extends AppCompatActivity {
         ReCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                vibrator.vibrate(250);
+
                 tts.speak(str,TextToSpeech.QUEUE_FLUSH,null);
             }
         });
