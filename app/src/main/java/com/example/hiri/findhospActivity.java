@@ -85,6 +85,10 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
 
                     String text = " 병원을 평점순으로 검색합니다.";
                     ttsClient.play(text);
+
+                }else{
+                    String text = "호출버튼을 눌러 진료과목을 말하세요.";
+                    ttsClient.play(text);
                 }
             }
         });
@@ -96,6 +100,11 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
                     scorebool = false;
 
                     String text = " 병원을 거리순으로 검색합니다.";
+                    ttsClient.play(text);
+
+
+                }else{
+                    String text = "호출버튼을 눌러 진료과목을 말하세요.";
                     ttsClient.play(text);
                 }
             }
@@ -227,9 +236,15 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
         }*/
         if(scorebool){//평점순 검색
             scorebool = false;
+            Intent intent = new Intent(getApplicationContext(),search_hosActivity.class);
+            intent.putExtra("yadmNum",str1);//진료과목 명
+            intent.putExtra("dgsbjtCd",dgsbjtCd);//진료과목 코드
+            startActivity(intent);//진료과목을 검색하는 클래스로 이동
+            dgsbjtCd=null;
             Log.d("TAG", "scorebool: "+scorebool);;
         }else if(distancebool){//거리순 검색
             distancebool = false;
+            dgsbjtCd=null;
             Log.d("TAG", "distancebool: "+distancebool);;
         }
 
@@ -237,6 +252,14 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
 
     @Override
     public void onError(int code, String message) {
+        Log.d("TAG","Error code:"+code +"Error message"+message);
+    }
+    // 더 이상 쓰지 않는 경우에는 다음과 같이 해제
+    public void onDestroy() {
+        super.onDestroy();
+        if(ttsClient!=null){
+            ttsClient.stop();
+        }
 
     }
 }

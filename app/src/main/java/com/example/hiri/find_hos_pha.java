@@ -35,7 +35,7 @@ public class find_hos_pha extends AppCompatActivity implements TextToSpeechListe
                 .setListener(this)
                 .build();
 
-        String str = "병원 약국 찾기 서비스 입니다. 화면의 세로 반을 기준으로 왼쪽 버튼은 병원찾기 이고 오른쪽 버튼은 약국찾기 입니다.";
+        String str = "병원 약국 찾기 서비스 입니다. 화면의 세로 반을 기준으로 왼쪽 버튼은 병원찾기버튼 이고 오른쪽 버튼은 약국찾기버튼 입니다.";
         ttsClient.play(str);
 
         button1.setOnClickListener(new View.OnClickListener() {
@@ -80,5 +80,13 @@ public class find_hos_pha extends AppCompatActivity implements TextToSpeechListe
     @Override
     public void onError(int code, String message) {
         Log.d("TAG","Error code:"+code +"Error message"+message);
+    }
+    // 더 이상 쓰지 않는 경우에는 다음과 같이 해제
+    public void onDestroy() {
+        super.onDestroy();
+        if(ttsClient!=null){
+            ttsClient.stop();
+        }
+
     }
 }

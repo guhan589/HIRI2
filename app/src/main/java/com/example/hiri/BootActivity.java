@@ -23,12 +23,10 @@ public class BootActivity extends AppCompatActivity implements TextToSpeechListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_boot);
 
-        final int PERMISSION = 1;
+
         TextToSpeechManager.getInstance().initializeLibrary(getApplicationContext());//tts 초기화
         SpeechRecognizerManager.getInstance().initializeLibrary(getApplicationContext());//stt 초기화
-        if (Build.VERSION.SDK_INT >= 23) {      //퍼미션 권한 부여
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET, Manifest.permission.RECORD_AUDIO,Manifest.permission.INTERNET,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CALL_PHONE}, PERMISSION);
-        }
+
         /*try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
@@ -53,7 +51,7 @@ public class BootActivity extends AppCompatActivity implements TextToSpeechListe
                                                                                 //VOICE_MAN_DIALOG_BRIGHT 남성 밝은 대화체
                 .setListener(this)
                 .build();
-        String str = "안녕하세요. 시각장애인용 약품 정보 서비스입니다. ";//어플 시작 멘트
+        String str = "안녕하세요. 시각장애인용 의료 정보 서비스입니다. ";//어플 시작 멘트
         //ttsClient.setSpeechText(str);  // ttsClient.play();
         ttsClient.play(str);
 

@@ -1,8 +1,11 @@
 package com.example.hiri;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +18,7 @@ import com.kakao.sdk.newtoneapi.TextToSpeechManager;
 public class HomeActivity extends AppCompatActivity implements TextToSpeechListener {
     private TextToSpeechClient ttsClient;
     public boolean findbool1 = false, findbool2 = false, weatherbool = false, sosbool = false;
+    final int PERMISSION = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +34,10 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
         //내부변수
         int buttoncount1=0, buttoncount2 = 0, buttoncount3 = 0, buttoncount4 = 0;
 
+
+        if (Build.VERSION.SDK_INT >= 23) {      //퍼미션 권한 부여
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET, Manifest.permission.RECORD_AUDIO,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CALL_PHONE}, PERMISSION);
+        }//퍼미션접근 권한
 
         TextToSpeechManager.getInstance().finalizeLibrary();
         ttsClient = new TextToSpeechClient.Builder()
