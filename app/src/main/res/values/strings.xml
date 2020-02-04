@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">HIRI</string>
+    <string name="app_name">hiri</string>
+    <string name="kakao_app_key">42d4840398761db5a6e772e49a51bb55</string>
+
 </resources>
