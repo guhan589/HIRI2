@@ -4,6 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view_hosActivity">
+    tools:context=".Recommend2">
+
+    <Button
+        android:id="@+id/CallButton"
+        android:layout_width="0dp"
+        android:layout_height="365dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/ic_launcher_call"
+        app:layout_constraintBottom_toTopOf="@+id/RecallButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/RecallButton"
+        android:layout_width="0dp"
+        android:layout_height="365dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/ic_launcher_recall"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/CallButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

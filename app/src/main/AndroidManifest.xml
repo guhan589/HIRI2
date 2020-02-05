@@ -3,10 +3,10 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.example.hiri">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET LocationDemoActivity.java " />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <dist:module dist:instant="true" />
@@ -18,7 +18,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-        <activity android:name=".view_hosActivity"></activity>
+        <activity android:name=".Hos_resultActivity"></activity>
+        <activity android:name=".view_hosActivity" />
         <activity android:name=".search_hosActivity" />
         <activity android:name=".findphaActivity" />
         <activity android:name=".findhospActivity" />

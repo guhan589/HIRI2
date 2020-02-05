@@ -15,6 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.kakao.sdk.newtoneapi.TextToSpeechClient;
+import com.kakao.sdk.newtoneapi.TextToSpeechListener;
+import com.kakao.sdk.newtoneapi.TextToSpeechManager;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,11 +27,12 @@ import java.util.StringTokenizer;
 
 import static android.speech.tts.TextToSpeech.ERROR;
 
-public class view_hosActivity extends AppCompatActivity {
+public class view_hosActivity extends AppCompatActivity implements TextToSpeechListener {
+
     ArrayList<String> list;
     Button CallButton, ReCallButton;
     private Vibrator vibrator;
-    TextToSpeech ttsClient;
+    TextToSpeechClient ttsClient;
     int count1 = 0,count2 = 0,num=0;
     String teststring = "",str="",yadmNm="";
     HashMap<String,String> code;
@@ -37,18 +42,31 @@ public class view_hosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_hos);
 
-        yadmNm = getIntent().getStringExtra("yadmNm");
-        String totalinformation  = getIntent().getStringExtra("information");
+        CallButton = findViewById(R.id.CallButton);
+        ReCallButton = findViewById(R.id.RecallButton);
+        yadmNm = getIntent().getStringExtra("yadmNm");  //진료과목
+        String totalinformation  = getIntent().getStringExtra("information");  //병원 목록
 
+
+        TextToSpeechManager.getInstance().finalizeLibrary();//음성설정
+        ttsClient = new TextToSpeechClient.Builder()
+                .setSpeechMode(TextToSpeechClient.NEWTONE_TALK_2  )     // NEWTONE_TALK_1  통합 음성합성방식   NEWTONE_TALK_2 편집 합성 방식
+                .setSpeechSpeed(1.0)            // 발음 속도(0.5~4.0)
+                .setSpeechVoice(TextToSpeechClient.VOICE_WOMAN_READ_CALM    )  //TTS 음색 모드 설정(여성 차분한 낭독체)
+                //VOICE_MAN_READ_CALM  남성 차분한 낭독체
+                //VOICE_WOMAN_DIALOG_BRIGHT  여성 밝은 대화체
+                //VOICE_MAN_DIALOG_BRIGHT 남성 밝은 대화체
+                .setListener(this)
+                .build();
 
         Log.d("TAG", "view_hos_Activity_yadmNm: "+yadmNm);;
-        Log.d("TAG", "view_hos_Activity_totalinformation: "+totalinformation);;
+        Log.d("TAG", "view_hos_Activity_totalinformation: "+totalinformation);
         list=new ArrayList<String>();
         StringTokenizer token1 = new StringTokenizer(totalinformation, "\n");
         String[] buffer = new String[token1.countTokens()];
         count1 = 0;
         //////////////////////////////////////////////////////////////////////////////////////////////////////
-        while(token1.hasMoreTokens()){
+        while(token1.hasMoreTokens()){      // 각 병원 마다의 정보들을 하나로 취급해서 token 실시
             buffer[count1] = token1.nextToken();
             buffer[count1] = buffer[count1].replaceAll("\n", "");
             list.add(buffer[count1]);
@@ -56,10 +74,10 @@ public class view_hosActivity extends AppCompatActivity {
         }
         int i = 0;
         //////////////////////////////////////////////////////////////////////////////////////////////////////
-        code = new HashMap<>();
-        while(i<list.size()){
+        code = new HashMap<>();     //해쉬맵 생성자
+        while(i<list.size()){       // 하나의 병원에 대한 정보들을 문자열 배열 buffer2에 저장
             StringTokenizer token2 = new StringTokenizer(list.get(i),"/");
-            String[] buffer2 = new String[token2.countTokens()];
+            String[] buffer2 = new String[token2.countTokens()];    //토큰의 개수와 맞는 문자열 배열 사이즈 생성
             count2 = 0;
             while(token2.hasMoreTokens()){
                 buffer2[count2] = token2.nextToken();
@@ -67,37 +85,31 @@ public class view_hosActivity extends AppCompatActivity {
                 count2++;
             }
             String str1="";
-            str1 = Integer.toString(i+1);
+            str1 = Integer.toString(i+1);   //병원 별로 번호 부여
             str1 = str1+"번";
-            code.put(str1,buffer2[4]);
+            code.put(str1,buffer2[4]); //
 
-            teststring+= (i+1)+"번"+buffer2[4]+"\n";//+"평가등급 "+buffer2[5]
+            teststring+= (i+1)+"번"+buffer2[4]+"\n";//+"평가등급 "+buffer2[5] //병원의 이름을 tts로 출력하기 위해 teststring 변수에 임시 저장
             i++;
         }
 
-        Iterator<String> it = code.keySet().iterator();
+        Iterator<String> it = code.keySet().iterator(); //병원의 정보가 담겨있는 해쉬맵을 탐색하고자 반복자 선언
+
         while(it.hasNext()){
             String key1 = it.next();
             String key2 = code.get(key1);
         }
-        ttsClient = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
+        if(count1== 0) { // 과목을 진료하는 병원이 없을 경우
+            str = "   말씀하신 진료과목에 해당하는 병원이 없습니다.  다시 들으시려면 핸드폰 화면 세로중앙을 기준으로 하단 버튼을 누르십시오.";
+        }
+        else {  //과목을 진료하는 병원이 있을 경우
+            str = " 말씀하신 진료과목  "+yadmNm+" 를 진료하는 병원 총" + count1 + "건을 검색하였습니다. 병원목록을 불러드리겠습니다.  " + teststring + "  이상입니다. 다시 들으시려면 핸드폰 화면 세로중앙을 기준으로 하단 버튼을 누르시거나  "+
+                    "  검색하고자 하는 병원이 있으면 상단 버튼을 눌러 병원의 번호를 말하십시오.";
 
-                if(status != ERROR){
-                    tts.setLanguage(Locale.KOREAN);
-                }
-                if(count1== 0){
-                    str = "   말씀하신 진료과목에 해당하는 병원이 없습니다.  다시 들으시려면 핸드폰 화면 세로중앙을 기준으로 하단 버튼을 누르십시오.";}
-                else {
-                    str = " 말씀하신 진료과목  "+yadmNm+" 를 진료하는 병원 총" + count1 + "건을 검색하였습니다. 병원목록을 불러드리겠습니다.  " + teststring + "  이상입니다. 다시 들으시려면 핸드폰 화면 세로중앙을 기준으로 하단 버튼을 누르시거나  "+
-                            "  검색하고자 하는 병원이 있으면 상단 버튼을 눌러 병원의 번호를 말하십시오.";
-                }
-                ttsClient.setPitch(0.8f);
-                ttsClient.speak(str,TextToSpeech.QUEUE_FLUSH,null);
-            }
+        }
+        ttsClient.play(str); //병원목록 tts 실행
 
-        });
+
         call = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         call.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
         call.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-kr");
@@ -105,26 +117,21 @@ public class view_hosActivity extends AppCompatActivity {
         CallButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View V) {
-                String str1;
+                String text = "찾고자 하는 병원 번호를 말하십시오. 예를 들어 1번";
+                ttsClient.play(text);
+                while(ttsClient.isPlaying())
+                    ;
 
-                str1 = "찾고자 하는 병원 번호를 말하십시오. 예를 들어 1번";
-                tts.speak(str1, TextToSpeech.QUEUE_FLUSH, null);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        SpeechRecognizer Speech = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());//getApplicationContext:현재 엑티비티
-                        Speech.setRecognitionListener(listener);
-                        Speech.startListening(call);
-                    }
-                }, 3800);
+                SpeechRecognizer Speech = SpeechRecognizer.createSpeechRecognizer(getApplicationContext());//getApplicationContext:현재 엑티비티
+                Speech.setRecognitionListener(listener);
+                Speech.startListening(call);
             }
         });
 
         ReCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                tts.speak(str,TextToSpeech.QUEUE_FLUSH,null);
+                ttsClient.play(str);
             }
         });
     }
@@ -162,43 +169,43 @@ public class view_hosActivity extends AppCompatActivity {
             switch (error) {
                 case SpeechRecognizer.ERROR_AUDIO:
                     message = "오디오 에러";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_CLIENT:
                     message = "클라이언트 에러";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
                     message = "퍼미션 없음";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_NETWORK:
                     message = "네트워크 에러";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
                     message = "네트웍 타임아웃";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_NO_MATCH:
                     message = "찾을 수 없음";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
                     message = "음성인식 서비스가 과부하 되었습니다.";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_SERVER:
                     message = "서버 장애";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
                     message = "말하는 시간초과";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
                 default:
                     message = "알 수 없는 오류임";
-                    tts.speak(message.toString(), TextToSpeech.QUEUE_FLUSH, null);
+                    ttsClient.play(message);
                     break;
             }
 
@@ -219,7 +226,7 @@ public class view_hosActivity extends AppCompatActivity {
                     str1 = str1.replaceAll("번","");
                     num = Integer.parseInt(str1);
                     String str3 = list.get(num-1);
-                    Intent intent = new Intent(getApplicationContext(),Result.class);
+                    Intent intent = new Intent(getApplicationContext(),Hos_resultActivity.class);
                     intent.putExtra("list",list.get(num-1));
                     intent.putExtra("teststring",teststring);
                     startActivity(intent);
@@ -228,7 +235,7 @@ public class view_hosActivity extends AppCompatActivity {
                     str2 = "찾고자하는 진료과목을 검색하지 못하였습니다. 호출버튼을 눌러 다시 말하십시오.";
                 }
             }
-            tts.speak(str2, TextToSpeech.QUEUE_FLUSH, null);//출력할 문자
+            ttsClient.play(str2);
             matches.clear();
 
         }
@@ -247,9 +254,18 @@ public class view_hosActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        if(tts !=null){
-            tts.stop();
-            tts.shutdown();
+        if(ttsClient !=null){
+            ttsClient.stop();
         }
+    }
+
+    @Override
+    public void onFinished() {
+
+    }
+
+    @Override
+    public void onError(int code, String message) {
+        Log.d("TAG","Error code:"+code +"Error message"+message);
     }
 }
