@@ -5,8 +5,12 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +19,9 @@ import com.kakao.sdk.newtoneapi.SpeechRecognizerManager;
 import com.kakao.sdk.newtoneapi.TextToSpeechClient;
 import com.kakao.sdk.newtoneapi.TextToSpeechListener;
 import com.kakao.sdk.newtoneapi.TextToSpeechManager;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class BootActivity extends AppCompatActivity implements TextToSpeechListener {
     private TextToSpeechClient ttsClient;
@@ -27,18 +34,18 @@ public class BootActivity extends AppCompatActivity implements TextToSpeechListe
         TextToSpeechManager.getInstance().initializeLibrary(getApplicationContext());//tts 초기화
         SpeechRecognizerManager.getInstance().initializeLibrary(getApplicationContext());//stt 초기화
 
-        /*try {
+       try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
-                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+                Log.d("BootKeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-        }*///키 해시 값
+        }//키 해시 값 GET
 
 
         TextToSpeechManager.getInstance().finalizeLibrary();
@@ -51,7 +58,7 @@ public class BootActivity extends AppCompatActivity implements TextToSpeechListe
                                                                                 //VOICE_MAN_DIALOG_BRIGHT 남성 밝은 대화체
                 .setListener(this)
                 .build();
-        String str = "안녕하세요. 시각장애인용 의료 정보 서비스입니다. ";//어플 시작 멘트
+        String str = "안녕하세요. 건강보험심사평가원에서 제공하는 시각장애인용 의료 정보 서비스입니다. ";//어플 시작 멘트
         //ttsClient.setSpeechText(str);  // ttsClient.play();
         ttsClient.play(str);
 

@@ -117,6 +117,7 @@ public class view_hosActivity extends AppCompatActivity implements TextToSpeechL
         CallButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View V) {
+                ttsClient.stop();
                 String text = "찾고자 하는 병원 번호를 말하십시오. 예를 들어 1번";
                 ttsClient.play(text);
                 while(ttsClient.isPlaying())

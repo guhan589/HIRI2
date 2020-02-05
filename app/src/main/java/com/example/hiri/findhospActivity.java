@@ -54,7 +54,7 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
         code.put("안과","12");code.put("이비인후과","13");code.put("피부과","14");code.put("비뇨기과","15");code.put("영상의학과","16");code.put("방사선종양학과","17");
         code.put("병리과","18");code.put("진단검사의학과","19");code.put("결핵과","20");code.put("재활의학과","21");code.put("핵의학과","22");code.put("가정의학과","23");
         code.put("응급의학과","24");code.put("직업환경의학과","25");code.put("예방의학과","26");/*code.put("치과","49");*/code.put("구강악안면외과","50");code.put("치과보철과","51");code.put("치과교정과","52");
-        code.put("소아치과","53");code.put("치주과","54");code.put("치과보존과","55");code.put("치과보존과","55");code.put("구강내과","56");code.put("구강악안면방사선과","57");code.put("구강병리과","58");
+        code.put("소아치과","53");code.put("치주과","54");code.put("치과보존과","55");code.put("구강내과","56");code.put("구강악안면방사선과","57");code.put("구강병리과","58");
         code.put("예방치과","59");code.put("치과소계","60");code.put("한방내과","80");code.put("한방부인과","81");code.put("한방소아과","82");code.put("한방안이비인후피부과","83");code.put("한방신경정신과","84");
         code.put("침구과","85");code.put("한방재활의학과","86");code.put("사상체질과","87");code.put("한방응급","88");code.put("한방소계","90");
 
@@ -66,6 +66,7 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
             @Override
             public void onClick(View v) {
                 callbool = true;
+                ttsClient.stop();
                 String text1 = "원하는 진료과목을 말해보세요. 예를들어 치과";
 
                 ttsClient.play(text1);
@@ -80,11 +81,12 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
             @Override
             public void onClick(View v) {
                 if(dgsbjtCd != null){
+                    ttsClient.stop();
+                    String text = " 병원을 평점순으로 검색합니다.";
+                    ttsClient.play(text);
                     scorebool = true;
                     distancebool = false;
 
-                    String text = " 병원을 평점순으로 검색합니다.";
-                    ttsClient.play(text);
 
                 }else{
                     String text = "호출버튼을 눌러 진료과목을 말하세요.";
@@ -96,11 +98,12 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
             @Override
             public void onClick(View v) {
                 if(dgsbjtCd != null){
+                    ttsClient.stop();
+                    String text = " 병원을 거리순으로 검색합니다.";
+                    ttsClient.play(text);
                     distancebool = true;
                     scorebool = false;
 
-                    String text = " 병원을 거리순으로 검색합니다.";
-                    ttsClient.play(text);
 
 
                 }else{

@@ -36,7 +36,8 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
 
 
         if (Build.VERSION.SDK_INT >= 23) {      //퍼미션 권한 부여
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET, Manifest.permission.RECORD_AUDIO,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CALL_PHONE}, PERMISSION);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET, Manifest.permission.RECORD_AUDIO,Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION);
         }//퍼미션접근 권한
 
         TextToSpeechManager.getInstance().finalizeLibrary();

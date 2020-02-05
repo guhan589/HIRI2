@@ -41,6 +41,7 @@ public class find_hos_pha extends AppCompatActivity implements TextToSpeechListe
         button1.setOnClickListener(new View.OnClickListener() {
             @Override                           //병원 찾기
             public void onClick(View v) {
+                ttsClient.stop();
                 String text = "병원 찾기 서비스 버튼을 누르셨습니다.";
                 ttsClient.play(text);
                 findbool1 = true;
@@ -50,6 +51,7 @@ public class find_hos_pha extends AppCompatActivity implements TextToSpeechListe
         button2.setOnClickListener(new View.OnClickListener() {
             @Override                       //약국 찾기
             public void onClick(View v) {
+                ttsClient.stop();
                 String text = "약국 찾기 서비스 버튼을 누르셨습니다.";
                 ttsClient.play(text);
                 findbool2 = true;
