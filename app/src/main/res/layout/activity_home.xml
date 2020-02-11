@@ -1,65 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#e5d6b9"
+    android:gravity="center"
+    android:orientation="vertical"
     tools:context=".HomeActivity">
 
-    <TableLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <TableRow
+        <Button
+            android:id="@+id/button_pill"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/pill_drawable" />
 
-            <Button
-                android:id="@+id/button1"
-                android:layout_width="205dp"
-                android:layout_height="365dp"
-                android:text="찾기" />
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <Button
-                    android:id="@+id/button2"
-                    android:layout_width="205dp"
-                    android:layout_height="match_parent"
-                    android:text="병원/약국" />
-            </TableRow>
-
-        </TableRow>
-
-        <TableRow
+        <Button
+            android:id="@+id/button_find"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_drawable" />
 
-            <Button
-                android:id="@+id/button3"
-                android:layout_width="205dp"
-                android:layout_height="365dp"
-                android:text="날씨"
-                tools:text="날씨" />
+    </LinearLayout>
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-                <Button
-                    android:id="@+id/button4"
-                    android:layout_width="205dp"
-                    android:layout_height="match_parent"
-                    android:text="복지콜/SOS"
-                    tools:text="복지콜/SOS" />
-            </TableRow>
-        </TableRow>
+        <Button
+            android:id="@+id/button_weather"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/weather_drawable" />
 
-    </TableLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/button_call"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/call_drawable" />
+    </LinearLayout>
+
+</LinearLayout>

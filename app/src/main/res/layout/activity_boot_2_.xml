@@ -7,23 +7,23 @@
     android:background="#e5d6b9"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".FindActivity" >
+    tools:context=".Boot_2_Activity" >
 
     <Button
-        android:id="@+id/button_hospital"
+        android:id="@+id/button_blind"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
         android:layout_weight="1"
-        android:background="@drawable/hospital_drawable" />
+        android:background="@drawable/button_sound_drawable" />
 
     <Button
-        android:id="@+id/button_pharmacy"
+        android:id="@+id/button_elder"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="5dp"
         android:layout_weight="1"
-        android:background="@drawable/pharmacy_drawable" />
+        android:background="@drawable/button_soundx_drawable" />
 </LinearLayout>

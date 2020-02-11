@@ -1,6 +1,8 @@
 package com.example.hiri;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,32 +13,55 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.kakao.sdk.newtoneapi.TextToSpeechClient;
 import com.kakao.sdk.newtoneapi.TextToSpeechListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class findhospActivity extends AppCompatActivity implements TextToSpeechListener {
     private TextToSpeechClient ttsClient;
-    HashMap<String,String> code;
-
-    String str1=null,dgsbjtCd=null;
+    private ArrayList<HospitalSubject> mArrayList;
+    private ArrayList<String> list;
+    HashMap<String,String> code, view_code;
+    String str=null,str1=null,str2=null,dgsbjtCd=null;
     public boolean callbool = false, distancebool = false, scorebool=false;
     public Intent reco;
+    public Button button_repeat,button_voice;
+    RecyclerView recyclerView;
+    HospitalSubjectAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_findhosp);
-        Button callbutton, lbutton, rbutton;
+        setContentView(R.layout.activity_find_hospital_subject);
+        button_repeat = findViewById(R.id.button_repeat);
+        button_repeat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "다시 듣기 버튼", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        callbutton = findViewById(R.id.CallButton);
-        lbutton = findViewById(R.id.LeftButton);
-        rbutton = findViewById(R.id.RightButton);
+        //호출 버튼을 눌렀을 때 음성인식?
+        button_voice = findViewById(R.id.button_voice);
+        button_voice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "호출 버튼", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
 
         ttsClient = new TextToSpeechClient.Builder()   //음성 합성 포맷
                 .setSpeechMode(TextToSpeechClient.NEWTONE_TALK_2  )     // NEWTONE_TALK_1  통합 음성합성방식   NEWTONE_TALK_2 편집 합성 방식
@@ -48,21 +73,78 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
                 .setListener(this)
                 .build();
 
+
+        recyclerView = findViewById(R.id.recyclerView);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2); // ~행 2열
+        recyclerView.setLayoutManager(gridLayoutManager);
+        mArrayList = new ArrayList<>();
+        adapter = new HospitalSubjectAdapter(mArrayList);
+        recyclerView.setAdapter(adapter);
+
         code = new HashMap<>();  // 진료명에 따른 진료과목코드 쌍
         code.put("일반의", "00");code.put("내과", "01");code.put("신경과", "02");code.put("정신건강의학과", "03");code.put("외과","04");code.put("정형외과", "05");
-        code.put("신경외과", "06");code.put("흉부외과","07");code.put("성형외과","08");code.put("마취통증의학과","09");code.put("산부인과","10");code.put("소아청소년과","11");
+        code.put("신경외과", "06");code.put("흉부외과","07");code.put("성형외과","08");code.put("마취통증의학과","09");code.put("산부인과","10");code.put("소아과","11");//소아청소년과
         code.put("안과","12");code.put("이비인후과","13");code.put("피부과","14");code.put("비뇨기과","15");code.put("영상의학과","16");code.put("방사선종양학과","17");
         code.put("병리과","18");code.put("진단검사의학과","19");code.put("결핵과","20");code.put("재활의학과","21");code.put("핵의학과","22");code.put("가정의학과","23");
-        code.put("응급의학과","24");code.put("직업환경의학과","25");code.put("예방의학과","26");/*code.put("치과","49");*/code.put("구강악안면외과","50");code.put("치과보철과","51");code.put("치과교정과","52");
-        code.put("소아치과","53");code.put("치주과","54");code.put("치과보존과","55");code.put("구강내과","56");code.put("구강악안면방사선과","57");code.put("구강병리과","58");
-        code.put("예방치과","59");code.put("치과소계","60");code.put("한방내과","80");code.put("한방부인과","81");code.put("한방소아과","82");code.put("한방안이비인후피부과","83");code.put("한방신경정신과","84");
+        code.put("응급실","24");/*응급의학과*/code.put("직업환경의학과","25");code.put("예방의학과","26");/*code.put("치과","49");*//*code.put("구강악안면외과","50");*/code.put("치과보철과","51");code.put("치과교정과","52");
+        code.put("소아치과","53");code.put("치주과","54");code.put("치과보존과","55");code.put("구강내과","56");/*code.put("구강악안면방사선과","57");*/code.put("구강병리과","58");
+        code.put("예방치과","59");code.put("치과소계","60");code.put("한방내과","80");code.put("한방부인과","81");code.put("한방소아과","82");/*code.put("한방안이비인후피부과","83");*/code.put("한방신경정신과","84");
         code.put("침구과","85");code.put("한방재활의학과","86");code.put("사상체질과","87");code.put("한방응급","88");code.put("한방소계","90");
+
+        view_code = new HashMap<>();
+        view_code.put("내과", "01");view_code.put("신경과", "02");view_code.put("정신건강의학과", "03");view_code.put("외과","04");view_code.put("정형외과", "05");
+        view_code.put("신경외과", "06");view_code.put("흉부외과","07");view_code.put("성형외과","08");view_code.put("산부인과","10");view_code.put("소아과","11");//소아청소년과
+        view_code.put("안과","12");view_code.put("이비인후과","13");view_code.put("피부과","14");view_code.put("비뇨기과","15");
+        view_code.put("가정의학과","23");view_code.put("응급실","24");/*응급의학과*/view_code.put("치과","49");view_code.put("소아치과","53");
+        view_code.put("한의원","82");/*code.put("한방안이비인후피부과","83");*/view_code.put("한방응급","88");
+
+        Set set = view_code.keySet();
+        Iterator iterator = set.iterator();
+        int num=1;
+        while(iterator.hasNext()){
+            String key = (String) iterator.next();
+            mArrayList.add(new HospitalSubject(Integer.toString(num), key));
+            Log.d("TAG", "mArrayList.size(): "+mArrayList.size());
+            num++;
+            //adapter.notifyDataSetChanged();
+        }
+
+        /*for(HospitalSubject hospitalSubject : mArrayList){
+
+        }*/
+        adapter.setOnItemClickListener(new HospitalSubjectAdapter.OnHospitalSubjectItemClickListener(){
+
+            @Override
+            public void onItemClick(HospitalSubjectAdapter.ViewHolder holder, View view, int position) {
+                Log.d("TAG", "position: "+position);
+                str =adapter.getItem(position).get_name();
+                Log.d("TAG", "str: "+str+"\n");
+                //String str2 = null;
+                Iterator<String> iterator = code.keySet().iterator();
+                while (iterator.hasNext()) {//토근의 개수가 null일 때까지
+                    String key = iterator.next();
+                    Log.d("TAG", "key: "+key+"\n");
+                    Log.d("TAG", "key.equals(str): "+key.equals(str)+"\n");
+                    if (key.equals(str)) {
+                        //str1 = str;
+                        str2 = str+"\n을 진료하는 병원을 검색합니다.";
+
+                        dgsbjtCd = code.get(key);
+                        Log.d("TAG", "dgsbjtCd: "+dgsbjtCd+"\n");
+                        scorebool=true;
+                        ttsClient.play(str2);
+
+                        break;
+                    }
+                }
+            }
+        });
 
         reco = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         reco.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
         reco.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-kr");
 
-        callbutton.setOnClickListener(new View.OnClickListener() {
+       /*button_voice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 callbool = true;
@@ -77,41 +159,12 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
                 Speech.startListening(reco);
             }
         });
-        lbutton.setOnClickListener(new View.OnClickListener() {
+        button_repeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(dgsbjtCd != null){
-                    ttsClient.stop();
-                    String text = " 병원을 평점순으로 검색합니다.";
-                    ttsClient.play(text);
-                    scorebool = true;
-                    distancebool = false;
-
-
-                }else{
-                    String text = "호출버튼을 눌러 진료과목을 말하세요.";
-                    ttsClient.play(text);
-                }
             }
-        });
-        rbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(dgsbjtCd != null){
-                    ttsClient.stop();
-                    String text = " 병원을 거리순으로 검색합니다.";
-                    ttsClient.play(text);
-                    distancebool = true;
-                    scorebool = false;
+        });*/
 
-
-
-                }else{
-                    String text = "호출버튼을 눌러 진료과목을 말하세요.";
-                    ttsClient.play(text);
-                }
-            }
-        });
     }
     /////////////////음성호출/////////////////////
     private RecognitionListener listener = new RecognitionListener() {
@@ -194,14 +247,14 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
         public void onResults(Bundle bundle) {//인식결과가 준비되면 호출
             //resultText = (TextView) findViewById(R.id.resultText);//res resultText
             ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);//ArrayList는 크기를 미리 정하지 않아 얼마든지 많은 수의 데이터를 저장
-            str1 = matches.get(0);
+            str = matches.get(0);
 
-            str1 = str1.replaceAll(" ", "");//음성인식으로 받은 문자열 공백 제거
-            String str2 = null;
+            str = str.replaceAll(" ", "");//음성인식으로 받은 문자열 공백 제거
+            //String str2 = null;
             Iterator<String> iterator = code.keySet().iterator();
             while (iterator.hasNext()) {//토근의 개수가 null일 때까지
                 String key = iterator.next();
-                if (key.equals(str1)) {
+                if (key.equals(str)) {
                     str2 = "진료과목을 찾았습니다. 휴대폰 하단부 왼쪽 버튼은 평점순이고 오른쪽 버튼은 거리순입니다. 원하는 조건버튼을 선택하십시오.";
 
                     dgsbjtCd = code.get(key);
@@ -239,18 +292,16 @@ public class findhospActivity extends AppCompatActivity implements TextToSpeechL
         }*/
         if(scorebool){//평점순 검색
             scorebool = false;
-            Intent intent = new Intent(getApplicationContext(),search_hosActivity.class);
-            intent.putExtra("yadmNum",str1);//진료과목 명
-            intent.putExtra("dgsbjtCd",dgsbjtCd);//진료과목 코드
-            startActivity(intent);//진료과목을 검색하는 클래스로 이동
+            Intent intent1 = new Intent(getApplicationContext(),LoadingActivity.class);
+            startActivity(intent1);;
+
+            Intent intent2 = new Intent(getApplicationContext(),search_hosActivity.class);
+            intent2.putExtra("yadmNum",str);//진료과목 명
+            intent2.putExtra("dgsbjtCd",dgsbjtCd);//진료과목 코드
+            startActivity(intent2);//진료과목을 검색하는 클래스로 이동
             dgsbjtCd=null;
             Log.d("TAG", "scorebool: "+scorebool);;
-        }else if(distancebool){//거리순 검색
-            distancebool = false;
-            dgsbjtCd=null;
-            Log.d("TAG", "distancebool: "+distancebool);;
         }
-
     }
 
     @Override

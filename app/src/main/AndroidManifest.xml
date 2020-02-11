@@ -3,23 +3,27 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.example.hiri">
 
-    <uses-permission android:name="android.permission.INTERNET LocationDemoActivity.java " />
+    <uses-permission android:name="android.permission.INTERNET " />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <dist:module dist:instant="true" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="페이스"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-        <activity android:name=".Hos_resultActivity"></activity>
-        <activity android:name=".view_hosActivity" />
+        <activity android:name=".Boot_2_Activity"></activity>
+        <activity android:name=".show_totalweatherActivity" />
+        <activity android:name=".show_myweatherActivity" />
+        <activity android:name=".select_weatherActivity" />
+        <activity android:name=".Hos_resultActivity" />
         <activity android:name=".search_hosActivity" />
         <activity android:name=".findphaActivity" />
         <activity android:name=".findhospActivity" />

@@ -1,15 +1,21 @@
 package com.example.hiri;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -17,6 +23,7 @@ import net.daum.mf.map.api.MapView;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 
@@ -24,35 +31,82 @@ public class Hos_resultActivity extends AppCompatActivity implements MapView.POI
     //public MapView mapView;
     double x, y;
     int count = 0 ;
-    String teststring;
+    String information;
     String[] buffer;
+    Hospital hospital;
+    public HospitalAdapter mAdapter;
+    private ArrayList<Hospital> mArrayList;
+    public RecyclerView recyclerView;
+    public MapView mapView;
+    LinearLayoutManager mlinearLayoutManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_hos_result);
+        setContentView(R.layout.activity_find_pharmacy);
         ////////////////// Intent 받은 데이터 추출 과정 //////////////////////
-        String str = getIntent().getStringExtra("list");
-        teststring = getIntent().getStringExtra("teststring");
-        StringTokenizer token = new StringTokenizer(str, "/");
-        buffer = new String[token.countTokens()];
+        String yadmNm = getIntent().getStringExtra("yadmNm");
+        information = getIntent().getStringExtra("information");
+
+        Log.d("TAG", "yadmNm: "+yadmNm+"\n");
+        Log.d("TAG", "information: "+information+"\n");
+
+
         int count = 0;
+        recyclerView = findViewById(R.id.recyclerView);
+        mlinearLayoutManager = new LinearLayoutManager(this);
+
+        recyclerView.setLayoutManager(mlinearLayoutManager);
+        recyclerView.setHasFixedSize(true);
+
+        mArrayList = new ArrayList<>();
+        mAdapter = new HospitalAdapter(mArrayList);
+        recyclerView.setAdapter(mAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),mlinearLayoutManager.getOrientation());//구분선을 넣기 위함
+
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+        StringTokenizer token = new StringTokenizer(information, "\n");
+        buffer = new String[token.countTokens()];
         while (token.hasMoreTokens()) {
             buffer[count] = token.nextToken();
             buffer[count] = buffer[count].replaceAll("\n", "");
             Log.d("TAG", "\nbuffer["+count+"]="+ buffer[count]+"\n");
             count++;
         }
-        //buffer 0: 병원 주소  buffer 1: 전화번호  buffer 2 : y좌표  buffer 3: x 좌표  , buffer 4: 주소, buffer 5: 병원등급
-        x = Double.parseDouble(buffer[3]);
-        y = Double.parseDouble(buffer[2]);
+        String[] buffer2 = new String[7];
+
+        for(int i = 0 ; i<buffer.length;i++){
+            token = new StringTokenizer(buffer[i], "/");
+            Log.d("TAG", "buffer["+i+"]="+buffer[i]+"\n");
+            //buffer 0: 병원 주소  buffer1: 병원규모 buffer 2: 전화번호  buffer 3 : y좌표  buffer 4: x 좌표  , buffer 5: 병원이름, buffer 6: 병원등급
+            buffer2[0] = token.nextToken(); //주소
+            buffer2[1] = token.nextToken(); //규모
+            buffer2[2] = token.nextToken(); //전화번호
+            buffer2[3] = token.nextToken(); // y좌표
+            buffer2[4] = token.nextToken(); //x 좌표
+            buffer2[5] = token.nextToken(); // 병원 이름
+            buffer2[6] = token.nextToken(); // 병원등급
+
+            x = Double.parseDouble(buffer2[4]);
+            y = Double.parseDouble(buffer2[3]);
+            Log.d("TAG", "buffer2[0]: "+buffer2[0]+"buffer2[1]: "+buffer2[1]+"buffer2[2]: "+buffer2[2]+"buffer2[3]: "+buffer2[3]+"buffer2[4]: "+buffer2[4]
+            +"buffer2[5]: "+buffer2[5]+"buffer2[6]: "+buffer2[6]);
+            String[] array = buffer2[0].split("\\(");//주소의 (읍,면,동) 의 정보 삭제
+            hospital = new Hospital(array[0],buffer2[1],buffer2[2],buffer2[5],x,y);// 주소, 규모 ,전화번호, 약국이름, x,y
+            mArrayList.add(hospital);
+            mAdapter.notifyDataSetChanged();
+
+        }
+
 
         Log.d("TAG", "Hos_resultActivtiy  x: "+x);
         Log.d("TAG", "Hos_resultActivtiy  y: "+y);
 
 
         ////////////카카오 지도 관련 코드/////////////
-        MapView mapView = new MapView(this);
-        ViewGroup mapViewContainer = (ViewGroup) findViewById(R.id.map_view);
+        mapView = new MapView(this);
+        ViewGroup mapViewContainer = (ViewGroup) findViewById(R.id.mapview);
         mapViewContainer.addView(mapView);
 
 
@@ -81,7 +135,7 @@ public class Hos_resultActivity extends AppCompatActivity implements MapView.POI
         //////////// 지도 위 병원 마크 ///////////////
         MapPoint MARKER_POINT = MapPoint.mapPointWithGeoCoord(x, y);
         MapPOIItem marker = new MapPOIItem();
-        marker.setItemName(buffer[4]);
+        marker.setItemName(buffer2[4]);
         marker.setTag(0);
         marker.setMapPoint(MARKER_POINT);
         marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
@@ -89,6 +143,31 @@ public class Hos_resultActivity extends AppCompatActivity implements MapView.POI
 
         mapView.addPOIItem(marker);
 
+        mAdapter.setOnItemClickListener(new HospitalAdapter.OhHospitalItemClickListener(){
+            @Override
+            public void onItemClick(HospitalAdapter.ViewHolder holder, View view, int position) {
+                double ph_latitude = mAdapter.getItem(position).getX();
+                double ph_longitude = mAdapter.getItem(position).getY();
+                String phr_name = mAdapter.getItem(position).getYadmNm();
+                mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(ph_latitude, ph_longitude), 1, true);
+                MapPoint MARKER_POINT = MapPoint.mapPointWithGeoCoord(ph_latitude, ph_longitude);
+                MapPOIItem marker = new MapPOIItem();
+                marker.setItemName(phr_name);
+                marker.setTag(0);
+                marker.setMapPoint(MARKER_POINT);
+                marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
+                marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+                mapView.addPOIItem(marker);
+            }
+            @Override
+            public void onCallClick(int position) {
+                String telno = mAdapter.getItem(position).getTelno();
+                Log.d("TAG", "telno: "+telno);
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:"+telno));
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

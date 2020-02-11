@@ -22,8 +22,8 @@ public class find_hos_pha extends AppCompatActivity implements TextToSpeechListe
 
         //레이아웃 개체
         Button button1,button2;
-        button1  = findViewById(R.id.button1);
-        button2 = findViewById(R.id.button2);
+        button1  = findViewById(R.id.button_hospital);
+        button2 = findViewById(R.id.button_pharmacy);
 
         ttsClient = new TextToSpeechClient.Builder()   //음성 합성 포맷
                 .setSpeechMode(TextToSpeechClient.NEWTONE_TALK_2  )     // NEWTONE_TALK_1  통합 음성합성방식   NEWTONE_TALK_2 편집 합성 방식
@@ -35,7 +35,7 @@ public class find_hos_pha extends AppCompatActivity implements TextToSpeechListe
                 .setListener(this)
                 .build();
 
-        String str = "병원 약국 찾기 서비스 입니다. 화면의 세로 반을 기준으로 왼쪽 버튼은 병원찾기버튼 이고 오른쪽 버튼은 약국찾기버튼 입니다.";
+        String str = "병원 약국 찾기 서비스 입니다. 화면의 가로 반을 기준으로 상단 버튼은 병원찾기버튼 이고  \n  하단 버튼은 약국찾기버튼 입니다.";
         ttsClient.play(str);
 
         button1.setOnClickListener(new View.OnClickListener() {

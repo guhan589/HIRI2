@@ -23,7 +23,7 @@ import java.util.StringTokenizer;
 public class search_hosActivity extends AppCompatActivity {
     String getData;
     int count = 0, num = 0;
-    String count1 = "", totalyadmNm = "", information = "", buffer = "", str = "", yadmNm1 = "";
+    String  totalyadmNm = "", information = "", buffer = "", str = "", yadmNm1 = "";
     ArrayList<String> list, list2;
 
     @Override
@@ -36,6 +36,7 @@ public class search_hosActivity extends AppCompatActivity {
 
 
         yadmNm1 = getIntent().getStringExtra("yadmNum");
+        Log.d("TAG", "yadmNm1: "+yadmNm1+"\n");
         String dgsbjtCd = getIntent().getStringExtra("dgsbjtCd");//findhospActivity에서 넘겨준 진료과목 코드
         Log.d("TAG", "search_hos_yadmNm1: " + yadmNm1);
         Log.d("TAG", "search_hos_dgsbjtCd: " + dgsbjtCd);
@@ -45,6 +46,7 @@ public class search_hosActivity extends AppCompatActivity {
         String ServiceKey = "LjJVA0wW%2BvsEsLgyJaBLyTywryRMuelTIYxsWnQTaPpxdZjpuxVCdCtyNxvObDmBJ57VVaSi3%2FerYKQFQmKs8g%3D%3D";
         String TotalUrl = StrUrl + "?ServiceKey=" + ServiceKey + "&sgguCd=320400&dgsbjtCd=" + dgsbjtCd;
         DownLoad1 d1 = new DownLoad1();
+        Log.d("TAG", "TotalUrl: "+TotalUrl+"\n");
         d1.execute(TotalUrl);
 
         list.clear();
@@ -67,6 +69,7 @@ public class search_hosActivity extends AppCompatActivity {
             String resultCode = "";   //결과코드
             String yadmNm = "";   //요양기관 이름
             String addr = "";   //요양기관 주소
+            String clCdNm = ""; // 요양기관 규모
             String telno = "";   //요양기관 전화번호
             String XPos = "";   //요양기관x좌표
             String YPos = "";  //요양기관 y좌표
@@ -77,6 +80,7 @@ public class search_hosActivity extends AppCompatActivity {
             boolean ho_telno = false;//요양기관 전화번호
             boolean ho_XPos = false;//요양기관 x좌료
             boolean ho_YPos = false;
+            boolean ho_clCdNm = false;
             try {
                 XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
                 xmlPullParserFactory.setNamespaceAware(true);
@@ -110,6 +114,10 @@ public class search_hosActivity extends AppCompatActivity {
                                 Log.d("TAG", "XPos");
                                 ho_XPos = true;
                                 break;
+                            case "clCdNm":
+                                Log.d("TAG", "YPos");
+                                ho_clCdNm = true;
+                                break;
                             case "YPos":
                                 Log.d("TAG", "YPos");
                                 ho_YPos = true;
@@ -128,37 +136,45 @@ public class search_hosActivity extends AppCompatActivity {
                             }
                             if (ho_yadmNm) {
                                 yadmNm = xmlPullParser.getText();//요양기관 이름
-                                String countname = Integer.toString(count + 1);
-                                String name = countname + "번" + yadmNm + "\n";
+                                //String countname = Integer.toString(count + 1);
+                               // String name = countname + "번" + yadmNm + "\n";
                                 //totalyadmNm = totalyadmNm + name;//병원 목록 음성 출력
                                 information = information + yadmNm + "/";//병원 정보 문자열
                                 list.add(information);
-                                //textView.append(information+list.size()+"\n");
-                                Log.d("TAG", "\n==========DownLoad1_ho_yadmNm===========: \n");
-                                String StrUrl2 = "http://apis.data.go.kr/B551182/hospAsmRstInfoService/getGnhpSprmAsmRstList";
-                                String ServiceKey2 = "LjJVA0wW%2BvsEsLgyJaBLyTywryRMuelTIYxsWnQTaPpxdZjpuxVCdCtyNxvObDmBJ57VVaSi3%2FerYKQFQmKs8g%3D%3D";
-                                String TotalUrl2 = StrUrl2 + "?ServiceKey=" + ServiceKey2 + "&sgguCd=320400&yadmNm=" + yadmNm;
-                                DownLoad2 d2 = new DownLoad2();
-                                d2.execute(TotalUrl2);
-                                information = "";
-                                count++;
+                                StringTokenizer token = new StringTokenizer(list.get(count),"/");
+                                Log.d("TAG", "token.countToken11111111: ["+count+"]======="+token.countTokens()+"\n");
+                                if(token.countTokens()==6) {
+                                    Log.d("TAG", "\n==========DownLoad1_ho_yadmNm===========: \n");
+                                    String StrUrl2 = "http://apis.data.go.kr/B551182/hospAsmRstInfoService/getGnhpSprmAsmRstList";
+                                    String ServiceKey2 = "LjJVA0wW%2BvsEsLgyJaBLyTywryRMuelTIYxsWnQTaPpxdZjpuxVCdCtyNxvObDmBJ57VVaSi3%2FerYKQFQmKs8g%3D%3D";
+                                    yadmNm = yadmNm.replaceAll(" ", "%20");
+                                    String TotalUrl2 = StrUrl2 + "?ServiceKey=" + ServiceKey2 + "&sgguCd=320400&yadmNm=" + yadmNm;
+                                    Log.d("TAG", "TotalUrl2: " + TotalUrl2 + "\n");
+                                    DownLoad2 d2 = new DownLoad2();
+                                    d2.execute(TotalUrl2);
+                                    information = "";
+                                    count++;
+                                }else
+                                    list.remove(count);
                                 ho_yadmNm = false;
+                            }
+                            if (ho_clCdNm) {
+                                clCdNm = xmlPullParser.getText();
+                                information = information + clCdNm + "/";
+                                ho_clCdNm = false;
                             }
                             if (ho_telno) {
                                 telno = xmlPullParser.getText();
-                                //textView.append(count+"]"+telno+"\n");
                                 information = information + telno + "/";
                                 ho_telno = false;
                             }
                             if (ho_XPos) {
                                 XPos = xmlPullParser.getText();
-                                //textView.append(count+"]"+XPos+"\n");
                                 information = information + XPos + "/";
                                 ho_XPos = false;
                             }
                             if (ho_YPos) {
                                 YPos = xmlPullParser.getText();
-                                //textView.append(count+"]"+YPos+"\n");
                                 information = information + YPos + "/";
                                 ho_YPos = false;
                             }
@@ -168,7 +184,11 @@ public class search_hosActivity extends AppCompatActivity {
                     }
                     eventType = xmlPullParser.next();
                 }
-                Log.d("TAG", "information2" + information);
+                //Log.d("TAG", "\n\n\n\ninformation123" + information + "\n\n\n\n");
+              //  Log.d("TAG", "\n==========num==10===========: \n");
+
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -219,7 +239,8 @@ public class search_hosActivity extends AppCompatActivity {
             boolean ho_item = false;//세부하목
             boolean ho_asmGrd = false;//평가등급
             boolean ho_addr = false;//요양기관주소
-            //int num = 0;
+
+
             try {
                 XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
                 xmlPullParserFactory.setNamespaceAware(true);
@@ -255,21 +276,29 @@ public class search_hosActivity extends AppCompatActivity {
                             resultCode = xmlPullParser.getText();
                             ho_resultCode = false;
                         }
-                        if (resultCode.equals("00") && ho_body == true && ho_item == true) {
-                            if (ho_addr && ho_asmGrd) {
+                        if(resultCode.equals("00")&&ho_body==true&&ho_item==true){
+                            if(ho_asmGrd&&ho_addr) {
+                                Log.d("TAG", "===========asmGrd_Ok_count"+count+"==========\n");
+                                Log.d("TAG", "===========asmGrd_Ok_num"+num+"==========\n");
                                 asmGrd = xmlPullParser.getText();
-                                String str = list.get(num) + asmGrd + "\n";//asmGrd 평가등급
+                                String str = list.get(num) +  asmGrd + "/";//asmGrd 평가등급
                                 list.set(num, str);//해당병원 평점 넣기
+                                Log.d("TAG", "asmGrd_Yes: "+list.get(num)+"\n");
+                                //num++;
                                 num++;
                                 ho_asmGrd = false;
                                 ho_addr = false;
-                                ho_body = false;
+                                ho_body =false;
                                 ho_item = false;
                             }
-                        } else if (resultCode.equals("00") && ho_body == true && ho_item == false) {
-                            String str = list.get(num) + "6\n";//asmGrd 평가등급이 없으면 null
+                        } else if(resultCode.equals("00")&&ho_body==true&&ho_item==false) {
+                            Log.d("TAG", "===========asmGrd_No_count"+count+"==========\n");
+                            Log.d("TAG", "===========asmGrd_No_num"+num+"==========\n");
+                            String str = list.get(num) + "6/";//asmGrd 평가등급이 없으면 null
                             list.set(num, str);//해당병원 평점 넣기
-                            //textView.append(str+list.size());
+                            Log.d("TAG", "asmGrd_No: "+list.get(num)+"\n");
+
+                            //num++;
                             num++;
                             ho_body = false;
                         }
@@ -279,51 +308,64 @@ public class search_hosActivity extends AppCompatActivity {
                     }
                     eventType = xmlPullParser.next();
                 }
+                if(count==num){
+                    Log.d("TAG", "count: " + count + "\n");
+                    Log.d("TAG", "num: " + num + "\n");
+                    Log.d("TAG", "list.size(): " + list.size() + "\n");
+                    for (int i = 0; i < list.size(); i++) {
+                        for (int j = 0; j < list.size() - i - 1; j++) {
+                            StringTokenizer token1 = new StringTokenizer(list.get(j), "/");
+                            StringTokenizer token2 = new StringTokenizer(list.get(j + 1), "/");
+                            String[] buffer1 = new String[token1.countTokens()];
+                            String[] buffer2 = new String[token2.countTokens()];
+                            Log.d("TAG", "buffer1.token.countTokens: "+token1.countTokens());
+                            Log.d("TAG", "buffer2.token.countTokens: "+token2.countTokens());
+                            int count1 = 0;
+                            while (token1.hasMoreTokens()) {
+                                buffer1[count1] = token1.nextToken();
+                                buffer1[count1] = buffer1[count1].replaceAll("\n", "");
+                                Log.d("TAG", "buffer1[" + count1 + "]=" + buffer1[count1] + "\n");
+                                count1++;
+                            }
+                            count1 = 0;
+                            while (token2.hasMoreTokens()) {
+                                buffer2[count1] = token2.nextToken();
+                                buffer2[count1] = buffer2[count1].replaceAll("\n", "");
+                                Log.d("TAG", "buffer2[" + count1 + "]=" + buffer2[count1] + "\n");
+                                count1++;
+                            }
+                            Log.d("TAG", "buffer1[6]: "+buffer1[6]+"\n");
+                            Log.d("TAG", "buffer2[6]: "+buffer2[6]+"\n");
+                            int a = Integer.parseInt(buffer1[6]);
+                            int b = Integer.parseInt(buffer2[6]);
+
+                            if (a > b) {
+                                list2.add(list.get(j));
+                                list.set(j, list.get(j + 1));
+                                list.set(j + 1, list2.get(0));
+                                list2.clear();
+                            }
+                        }
+                    }
+                    for (int i = 0; i < list.size(); i++) {
+                        //textView.append(list.get(i)+"\n");
+                        totalyadmNm += list.get(i) + "\n";
+                    }
+                    Intent intent = new Intent(getApplicationContext(), Hos_resultActivity.class);
+                    intent.putExtra("yadmNm", yadmNm1); //진료과목이름
+                    intent.putExtra("information", totalyadmNm); //진료과목을 검사하는 병원 목록
+                    Log.d("TAG", "yadmNm: " + yadmNm1 + "\n");
+                    Log.d("TAG", "totalyadmNm: " + totalyadmNm + "\n");
+                    Log.d("TAG", "\n======================================\n");
+                    startActivity(intent);
+                    finish();
+                }
+
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (num == 10) {
-                Log.d("TAG", "\n==========num==10===========: \n");
-                for (int i = 0; i < num; i++) {
-                    for (int j = 0; j < num - i - 1; j++) {
-                        StringTokenizer token1 = new StringTokenizer(list.get(j), "/");
-                        StringTokenizer token2 = new StringTokenizer(list.get(j + 1), "/");
-                        String[] buffer1 = new String[token1.countTokens()];
-                        String[] buffer2 = new String[token2.countTokens()];
-                        int count1 = 0;
-                        while (token1.hasMoreTokens()) {
-                            buffer1[count1] = token1.nextToken();
-                            buffer1[count1] = buffer1[count1].replaceAll("\n", "");
-                            count1++;
-                        }
-                        count1 = 0;
-                        while (token2.hasMoreTokens()) {
-                            buffer2[count1] = token2.nextToken();
-                            buffer2[count1] = buffer2[count1].replaceAll("\n", "");
-                            count1++;
-                        }
-                        int a = Integer.parseInt(buffer1[5]);
-                        int b = Integer.parseInt(buffer2[5]);
-                        if (a > b) {
-                            list2.add(list.get(j));
-                            list.set(j, list.get(j + 1));
-                            list.set(j + 1, list2.get(0));
-                            list2.clear();
-                        }
-                    }
-                }
-                for (int i = 0; i < num; i++) {
-                    //textView.append(list.get(i)+"\n");
-                    totalyadmNm += list.get(i) + "\n";
-                }
-                Intent intent = new Intent(getApplicationContext(), view_hosActivity.class);
-                intent.putExtra("yadmNm", yadmNm1);
-                intent.putExtra("information", totalyadmNm);
-                Log.d("TAG", "\n======================================\n");
-                startActivity(intent);
-                finish();
-            }
+
         }
 
         public String DownLoadUrl2(String myurl) throws IOException {

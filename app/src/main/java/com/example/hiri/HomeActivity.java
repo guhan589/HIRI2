@@ -5,6 +5,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,10 +27,10 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
 
         //레이아웃 버튼 객체
         Button findbutton1, findbutton2, weatherbutton, sosbutton;
-        findbutton1 = findViewById(R.id.button1);
-        findbutton2 = findViewById(R.id.button2);
-        weatherbutton = findViewById(R.id.button3);
-        sosbutton =  findViewById(R.id.button4);
+        findbutton1 = findViewById(R.id.button_pill);
+        findbutton2 = findViewById(R.id.button_find);
+        weatherbutton = findViewById(R.id.button_weather);
+        sosbutton =  findViewById(R.id.button_call);
 
         //내부변수
         int buttoncount1=0, buttoncount2 = 0, buttoncount3 = 0, buttoncount4 = 0;
@@ -40,7 +41,7 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
                     Manifest.permission.CALL_PHONE,Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION);
         }//퍼미션접근 권한
 
-        TextToSpeechManager.getInstance().finalizeLibrary();
+
         ttsClient = new TextToSpeechClient.Builder()
                 .setSpeechMode(TextToSpeechClient.NEWTONE_TALK_2  )     // NEWTONE_TALK_1  통합 음성합성방식   NEWTONE_TALK_2 편집 합성 방식
                 .setSpeechSpeed(1.0)            // 발음 속도(0.5~4.0)
@@ -50,6 +51,7 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
                 //VOICE_MAN_DIALOG_BRIGHT 남성 밝은 대화체
                 .setListener(this)
                 .build();
+
 
         findbutton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,7 +64,6 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
         findbutton2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String str = "병원 및 약국 찾기 서비스 버튼을 누르셨습니다.";
                 ttsClient.play(str);
                 findbool1 = false;
@@ -77,13 +78,21 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
             public void onClick(View v) {
                 String str =  "날씨 정보 서비스 버튼을 누르셨습니다.";
                 ttsClient.play(str);
+                findbool1 = false;
+                findbool2 = false;
+                weatherbool = true;
+                sosbool = false;
             }
         });
         sosbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String str = "SOS 요청 서비스 버튼을 누르셨습니다.";
+                String str = "복지콜 버튼을 누르셨습니다. 통화연결을 하겠습니다.";
                 ttsClient.play(str);
+                findbool1 = false;
+                findbool2 = false;
+                weatherbool = false;
+                sosbool = true;
 
             }
         });
@@ -107,10 +116,14 @@ public class HomeActivity extends AppCompatActivity implements TextToSpeechListe
             startActivity(intent);
         }
         else if(weatherbool){
-
+            weatherbool = false;
+            Intent intent = new Intent(getApplicationContext(), select_weatherActivity.class);
+            startActivity(intent);
         }
         else if(sosbool){
-
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:129"));
+            startActivity(intent);
         }
     }
 
