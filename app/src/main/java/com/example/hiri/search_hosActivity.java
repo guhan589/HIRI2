@@ -1,11 +1,12 @@
 package com.example.hiri;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -25,19 +26,24 @@ public class search_hosActivity extends AppCompatActivity {
     int count = 0, num = 0;
     String  totalyadmNm = "", information = "", buffer = "", str = "", yadmNm1 = "";
     ArrayList<String> list, list2;
-
+    boolean state = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_hos);
+        setContentView(R.layout.activity_loading);//activity_loading
 
         list = new ArrayList<String>();
         list2 = new ArrayList<String>();
 
 
-        yadmNm1 = getIntent().getStringExtra("yadmNum");
-        Log.d("TAG", "yadmNm1: "+yadmNm1+"\n");
+        yadmNm1 = getIntent().getStringExtra("yadmNum"); //진료과목
         String dgsbjtCd = getIntent().getStringExtra("dgsbjtCd");//findhospActivity에서 넘겨준 진료과목 코드
+        state = getIntent().getBooleanExtra("state",false); // 음서출력 유/무
+
+
+        Log.d("TAG", "yadmNm1: "+yadmNm1+"\n");Log.d("TAG", "state: "+state+"\n");
+
+
         Log.d("TAG", "search_hos_yadmNm1: " + yadmNm1);
         Log.d("TAG", "search_hos_dgsbjtCd: " + dgsbjtCd);
 
@@ -47,8 +53,11 @@ public class search_hosActivity extends AppCompatActivity {
         String TotalUrl = StrUrl + "?ServiceKey=" + ServiceKey + "&sgguCd=320400&dgsbjtCd=" + dgsbjtCd;
         DownLoad1 d1 = new DownLoad1();
         Log.d("TAG", "TotalUrl: "+TotalUrl+"\n");
-        d1.execute(TotalUrl);
 
+        CheckTypesTask checkTypesTask = new CheckTypesTask();
+        checkTypesTask.execute();
+
+        d1.execute(TotalUrl);
         list.clear();
     }
 
@@ -152,10 +161,11 @@ public class search_hosActivity extends AppCompatActivity {
                                     Log.d("TAG", "TotalUrl2: " + TotalUrl2 + "\n");
                                     DownLoad2 d2 = new DownLoad2();
                                     d2.execute(TotalUrl2);
-                                    information = "";
+
                                     count++;
                                 }else
                                     list.remove(count);
+                                information = "";
                                 ho_yadmNm = false;
                             }
                             if (ho_clCdNm) {
@@ -309,7 +319,7 @@ public class search_hosActivity extends AppCompatActivity {
                     eventType = xmlPullParser.next();
                 }
                 if(count==num){
-                    Log.d("TAG", "count: " + count + "\n");
+                    Log.d("TAG", "count123123: " + count + "\n");
                     Log.d("TAG", "num: " + num + "\n");
                     Log.d("TAG", "list.size(): " + list.size() + "\n");
                     for (int i = 0; i < list.size(); i++) {
@@ -354,8 +364,11 @@ public class search_hosActivity extends AppCompatActivity {
                     Intent intent = new Intent(getApplicationContext(), Hos_resultActivity.class);
                     intent.putExtra("yadmNm", yadmNm1); //진료과목이름
                     intent.putExtra("information", totalyadmNm); //진료과목을 검사하는 병원 목록
+                    intent.putExtra("state",state);
+                    intent.putExtra("count",count);
                     Log.d("TAG", "yadmNm: " + yadmNm1 + "\n");
                     Log.d("TAG", "totalyadmNm: " + totalyadmNm + "\n");
+                    Log.d("TAG", "state: " + state + "\n");
                     Log.d("TAG", "\n======================================\n");
                     startActivity(intent);
                     finish();
@@ -389,4 +402,34 @@ public class search_hosActivity extends AppCompatActivity {
             }
         }
     }
+    private class CheckTypesTask extends AsyncTask<Void, Void, Void> {
+        ProgressDialog asyncDialog = new ProgressDialog(search_hosActivity.this);
+
+        @Override
+        protected void onPreExecute() {
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setMessage("검색중입니다.");
+
+            asyncDialog.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            for (int i = 0; i < 5; i++) {
+                asyncDialog.setProgress(i * 30);
+                //Thread.sleep(500);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            asyncDialog.dismiss();
+
+            //finish();
+        }
+    }
+
 }

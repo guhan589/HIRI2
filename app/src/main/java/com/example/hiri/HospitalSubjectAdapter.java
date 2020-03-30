@@ -3,7 +3,6 @@ package com.example.hiri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +19,9 @@ public class HospitalSubjectAdapter extends RecyclerView.Adapter<HospitalSubject
     public HospitalSubjectAdapter(ArrayList<HospitalSubject> mArrayList) {
         this.items = mArrayList;
     }
+
+
+
     public interface  OnHospitalSubjectItemClickListener{
         void onItemClick(HospitalSubjectAdapter.ViewHolder holder, View view, int position);
     }

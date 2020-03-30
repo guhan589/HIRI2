@@ -1,4 +1,7 @@
 package com.example.hiri;
 
-public interface OnSelectPharmacyItemClickListener {
+import android.view.View;
+
+public interface OnSelectPillItemClickListener {
+    public void onItemClick(SelectPillItemAdapter.ViewHolder holder, View view, int position);
 }

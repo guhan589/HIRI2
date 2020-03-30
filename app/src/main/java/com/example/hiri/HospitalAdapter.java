@@ -25,6 +25,7 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.ViewHo
     public interface OhHospitalItemClickListener{
         void onItemClick(HospitalAdapter.ViewHolder holder, View view, int position);
         void onCallClick(int position);
+        void onPath(int position);
     }
     @NonNull
     @Override
@@ -77,11 +78,16 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.ViewHo
             listener.onCallClick(position);
         }
     }
+    public void onPath(int position){
+        if (listener != null) {
+            listener.onPath(position);
+        }
+    }
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textview_name,textView_scale,textview_telno,textview_address;
-        Button call_btn;
+        Button call_btn,button_path;
 
         //ViewHolder 생성자로 전달되는 뷰 객체 참조
         public ViewHolder(final View itemView, final HospitalAdapter listener) {
@@ -92,6 +98,7 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.ViewHo
             textview_telno = itemView.findViewById(R.id.textView_number);
             textview_address = itemView.findViewById(R.id.textView_address);
             call_btn = itemView.findViewById(R.id.button_calling);
+            button_path= itemView.findViewById(R.id.button_path);
 
             //itemView에 OnClickListener 설정
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +120,16 @@ public class HospitalAdapter extends RecyclerView.Adapter<HospitalAdapter.ViewHo
                         int position = getAdapterPosition();
                         Log.d("TAG", "position: "+position);// 버튼 클릭시 위치 추출
                         listener.onCallClick(position);
+                    }
+                }
+            });
+            button_path.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        int position = getAdapterPosition();
+                        Log.d("TAG", "position: "+position);// 버튼 클릭시 위치 추출
+                        listener.onPath(position);
                     }
                 }
             });

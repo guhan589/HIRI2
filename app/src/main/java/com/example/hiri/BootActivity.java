@@ -1,20 +1,14 @@
 package com.example.hiri;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.kakao.sdk.newtoneapi.SpeechRecognizerManager;
 import com.kakao.sdk.newtoneapi.TextToSpeechClient;
@@ -29,13 +23,15 @@ public class BootActivity extends AppCompatActivity implements TextToSpeechListe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_boot);
+        //setContentView(R.layout.activity_boot);
 
 
-        TextToSpeechManager.getInstance().initializeLibrary(getApplicationContext());//tts 초기화
-        SpeechRecognizerManager.getInstance().initializeLibrary(getApplicationContext());//stt 초기화
-        ProgressBar progressBar = findViewById(R.id.progressBar2);
-        progressBar.incrementProgressBy(50);
+
+        TextToSpeechManager.getInstance().initializeLibrary(getApplicationContext());// 카카오 음성 tts 초기화
+        SpeechRecognizerManager.getInstance().initializeLibrary(getApplicationContext());//카카오 음성 stt 초기화
+                                                                                        //두개 중 하나의 서비스를 이용한다 해도 두 서비스 라이브러리를 초기화 해줘야함.
+
+
        try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
@@ -47,17 +43,17 @@ public class BootActivity extends AppCompatActivity implements TextToSpeechListe
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-        }//키 해시 값 GET
+        }// 카카오의 나의 프로젝트의 Hash Key를 등록하기 위해 hash key 를 Get하는 코드
 
-
-        //TextToSpeechManager.getInstance().finalizeLibrary();
+        //TextToSpeechManager.getInstance().finalizeLibrary(); //더이상 TTS를 사용하지 않을 시에 final 실시
         ttsClient = new TextToSpeechClient.Builder()     //음성 합성 포맷
                 .setSpeechMode(TextToSpeechClient.NEWTONE_TALK_2  )     // NEWTONE_TALK_1  통합 음성합성방식   NEWTONE_TALK_2 편집 합성 방식
                 .setSpeechSpeed(1.0)            // 발음 속도(0.5~4.0)
-                .setSpeechVoice(TextToSpeechClient.VOICE_WOMAN_READ_CALM    )  //TTS 음색 모드 설정(여성 차분한 낭독체)
+                .setSpeechVoice(TextToSpeechClient. VOICE_WOMAN_READ_CALM   )  //TTS 음색 모드 설정(여성 차분한 낭독체)
                                                                                 //VOICE_MAN_READ_CALM  남성 차분한 낭독체
                                                                                 //VOICE_WOMAN_DIALOG_BRIGHT  여성 밝은 대화체
                                                                                 //VOICE_MAN_DIALOG_BRIGHT 남성 밝은 대화체
+                                                                                //VOICE_WOMAN_READ_CALM
                 .setListener(this)
                 .build();
 
@@ -85,7 +81,7 @@ public class BootActivity extends AppCompatActivity implements TextToSpeechListe
         int intRecvSize = ttsClient.getReceivedDataSize();  //세션 중에 전송받은 데이터 사이즈
 
         final String strInacctiveText = "handleFinished() SentSize : " + intSentSize + "  RecvSize : " + intRecvSize;
-        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);//엑티비티 이동을 위한 인텐트 선언
+        Intent intent = new Intent(getApplicationContext(), Boot_2_Activity.class);//엑티비티 이동을 위한 인텐트 선언
         startActivity(intent);//위에서 선언한 엑티비티로 이동
         finish();
         Log.i("BootAcivity TAG", strInacctiveText);

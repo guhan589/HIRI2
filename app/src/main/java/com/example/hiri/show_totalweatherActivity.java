@@ -1,7 +1,7 @@
 package com.example.hiri;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +10,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.kakao.sdk.newtoneapi.SpeechRecognizerManager;
 import com.kakao.sdk.newtoneapi.TextToSpeechClient;
@@ -34,7 +36,7 @@ import java.util.StringTokenizer;
 
 public class show_totalweatherActivity extends AppCompatActivity implements TextToSpeechListener {
 
-    String StrUrl,ServiceKey,tmFc,information="",getData="";
+    String StrUrl,ServiceKey,tmFc,information="",getData="",text;
     StringBuilder TotalUrl;
     public TextToSpeechClient ttsClient;
     Button recall_btn, call_btn;
@@ -63,6 +65,31 @@ public class show_totalweatherActivity extends AppCompatActivity implements Text
                 .build();
         TotalUrl = new StringBuilder();
 
+        call_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                text  = "기상청에 통화연결을 하겠습니다.";
+                ttsClient.stop();
+                while(ttsClient.isPlaying())
+                    ;
+                ttsClient.play(text);
+                while(ttsClient.isPlaying())
+                    ;
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:" + 131));
+                startActivity(intent);
+            }
+        });
+        recall_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ttsClient.stop();
+                while(ttsClient.isPlaying())
+                    ;
+
+                ttsClient.play(information);
+            }
+        });
         Date currentTime = Calendar.getInstance().getTime();
         String date_text = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(currentTime);
         String time_text = new SimpleDateFormat("HHmm",Locale.getDefault()).format(currentTime);
@@ -172,6 +199,10 @@ public class show_totalweatherActivity extends AppCompatActivity implements Text
                 Log.d("TAG", "information_token_totatl: "+token.countTokens());
 
                 information = "전국 중기예보 날씨를 알려드리겠습니다." + information +"   \n이상입니다.";
+                ttsClient.stop();
+                while(ttsClient.isPlaying())
+                    ;
+                ttsClient.play(information);
 
                 call_btn.setOnClickListener(new View.OnClickListener() {
                     @Override

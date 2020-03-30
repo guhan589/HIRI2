@@ -1,11 +1,8 @@
 package com.example.hiri;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -13,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +19,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.kakao.sdk.newtoneapi.SpeechRecognizerManager;
 import com.kakao.sdk.newtoneapi.TextToSpeechClient;
@@ -45,7 +46,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import jxl.Sheet;
@@ -58,7 +58,7 @@ public class show_myweatherActivity extends AppCompatActivity implements TextToS
     Double latitude = 0.0, longitude = 0.0;
     int count =0;
     Location location;
-    String address="",information="",getData="",str_x="",str_y="",StrUrl,ServiceKey;
+    String address="",information="",getData="",str_x="",str_y="",StrUrl,ServiceKey,text;
     ArrayList<String> list;
     HashMap<String,String> map,pty,image;
     String[] buffer;
@@ -67,7 +67,7 @@ public class show_myweatherActivity extends AppCompatActivity implements TextToS
     //totalmessage.ape
     TextView pty_textview,reh_textview,t1h_textview,pm10_textview,pm25_textview;
     ImageView imageView ;
-    Button bt1;
+    Button recall_btn,call_btn;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,12 +95,31 @@ public class show_myweatherActivity extends AppCompatActivity implements TextToS
         pm10_textview = findViewById(R.id.textView_dust_pm10);//미세먼지
         pm25_textview = findViewById(R.id.textView_dust_pm25);//초미세먼지
 
-        bt1 = findViewById(R.id.button_voice);
-
-
-        bt1.setOnClickListener(new View.OnClickListener() {
+        recall_btn  = findViewById(R.id.button_repeat);
+        call_btn = findViewById(R.id.button_voice);
+        call_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ttsClient.stop();
+                while (ttsClient.isPlaying())
+                    ;
+                text  = "기상청에 통화연결을 하겠습니다.";
+                while (ttsClient.isPlaying())
+                    ;
+                ttsClient.play(text);
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:" + 131));
+                startActivity(intent);
+            }
+        });
+
+
+        recall_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ttsClient.stop();
+                while(ttsClient.isPlaying())
+                    ;
                 ttsClient.play(String.valueOf(totalmessage));
             }
         });
@@ -376,17 +395,19 @@ public class show_myweatherActivity extends AppCompatActivity implements TextToS
                 String reh = map.get("REH");//습도
                 String t1h = map.get("T1H");//온도
                 String t1h_1="";String state_temp="";
-                if("-".contains(t1h))
+                if(t1h.contains("-"))
                     state_temp = t1h.substring(0,1);
 
                 if(state_temp.equals("-")){
                     state_temp = "영하";
-                    t1h_1 = t1h.substring(1,4);
+                    t1h_1 = t1h.substring(1,t1h.length());
                 }
                 else {
                     state_temp = "영상";
                     t1h_1 = t1h;
                 }
+                Log.d("TAG", "state_temp: "+state_temp+"\n");
+                Log.d("TAG", "t1h_1: "+t1h_1+"\n");
                 pty_textview.setText(pty_str);
                 t1h_textview.setText(t1h);
                 reh_textview.setText(reh);
@@ -548,10 +569,19 @@ public class show_myweatherActivity extends AppCompatActivity implements TextToS
                     buffer[i].replaceAll("\t\r","");
                     i++;
                 }
-                buffer[2] = buffer[2].substring(0,2);
-                Log.d("TAG", "buffer[0]: "+buffer[0].length());
-                Log.d("TAG", "buffer[1]: "+buffer[1].length());
-                Log.d("TAG", "buffer[2]: "+buffer[2].length());
+               // buffer[2] = buffer[2].substring(0,2);
+                Log.d("TAG", "buffer[0].length: "+buffer[0].length());
+                Log.d("TAG", "buffer[1].length: "+buffer[1].length());
+                Log.d("TAG", "buffer[2]1.length: "+buffer[2].length());
+                Log.d("TAG", "buffer[0]: "+buffer[0]);
+                Log.d("TAG", "buffer[1]: "+buffer[1]);
+                Log.d("TAG", "buffer[2]: "+buffer[2]+"q");
+                if(buffer[2].length()==2){
+                    buffer[2] = buffer[2].substring(0,1);
+                }else if(buffer[2].length()==3){
+                    buffer[2] = buffer[2].substring(0,2);
+                }
+                Log.d("TAG", "buffer[2]2.length: "+buffer[2].length());
                 int pm10 = Integer.parseInt(buffer[1]);
                 int pm25 = Integer.parseInt(buffer[2]);//초미세먼지
                 String pm10_state = "";
@@ -593,6 +623,11 @@ public class show_myweatherActivity extends AppCompatActivity implements TextToS
                 }
 
                 totalmessage.append("\n 미세먼지 농도는"+pm10_state+"이고 초미세먼지 농도는"+pm25_state+"입니다.\n"+message);
+                ttsClient.stop();
+                while(ttsClient.isPlaying())
+                    ;
+
+                ttsClient.play(totalmessage.toString());
 
                 Log.d("TAG", "\npm10_state:"+pm10_state+"\npm25_state:"+pm25_state);
             } catch (Exception e) {
